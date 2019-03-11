@@ -32,6 +32,10 @@ values: `update` or `compare` (default)
 
 values: `convert` or `legacy` (default) 
 
+`org.daisy.dotify.devtools.regression.dotify.arguments` specifies whether optional Dotify arguments are added last to the command line or on their legacy positions (5, 6 and 9+). 
+
+values: `last`or `legacy` (default)
+
 ### Unbrailler ###
 This tool can be used to compare text differences in an xml-editor. A folder is scanned for PEF-files and the braille in each file is replaced by ascii characters for easier debugging.
 

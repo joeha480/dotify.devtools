@@ -138,6 +138,11 @@ public class DotifyRegressionTesterRunner implements RegressionInterface {
 		}
 	}
 
+	static boolean isSameArgument(String a1, String a2) {
+		String regex = "=";
+		return a1.split(regex)[0].equals(a2.split(regex)[0]);
+	}
+	
 	static String getArgumentKey(String a) {
 		String regex = "=";
 		return a.split(regex)[0];

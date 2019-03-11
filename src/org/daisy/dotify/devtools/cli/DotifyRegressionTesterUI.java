@@ -24,33 +24,66 @@ public class DotifyRegressionTesterUI {
 			System.out.println("Not enough arguments. Expected at least six arguments.");
 			System.exit(-1);
 		}
+		boolean optionalLast = System.getProperty("org.daisy.dotify.devtools.regression.dotify.arguments", "legacy").equals("last");
+		if (optionalLast) {
+			newMain(args);
+		} else {
+			legacyMain(args);
+		}
+	}
+	
+	private static void newMain(String[] args) {
+		try {
+			TableCatalogService tcs = TableCatalog.newInstance();
+			Collection<String> opts = new ArrayList<>();
+			addOpts(opts, args, 6);
+			DotifyRegressionTesterRunner rt = new DotifyRegressionTesterRunner(new File(args[0]), args[1], new File(args[2]), tcs.newTable(args[3]).newBrailleConverter(), opts);
+			setThread(rt, args, 4);
+			setHaltOnError(rt, args, 5);
+			rt.run();
+		} catch (IOException e) {
+			System.exit(-1);
+		}
+	}
+	
+	private static void legacyMain(String[] args) {
 		try {
 			TableCatalogService tcs = TableCatalog.newInstance();
 			Collection<String> opts = new ArrayList<>();
 			opts.add(args[3]);
 			opts.add(args[4]);
-			for (int i=8; i<args.length; i++) {
-				// add remaining optional arguments
-				opts.add(args[i]);
-			}
+			addOpts(opts, args, 8);
 			DotifyRegressionTesterRunner rt = new DotifyRegressionTesterRunner(new File(args[0]), args[1], new File(args[2]), tcs.newTable(args[5]).newBrailleConverter(), opts);
 			if (args.length >= 7) {
-				int thArg = 6;
-				try {
-					rt.setThreads(Integer.parseInt(args[thArg]));
-				} catch (NumberFormatException e) {
-					System.out.println(args[thArg] + " is not an integer.");
-				}
+				setThread(rt, args, 6);
 			}
 			if (args.length >= 8) {
-				int errArg = 7;
-				//This is a bit unusual, but the default value should be true and if the input is misspelled, it should use the default
-				rt.setHaltOnError(!"false".equalsIgnoreCase(args[errArg]));
+				setHaltOnError(rt, args, 7);
 			}
 			rt.run();
 		} catch (IOException e) {
 			System.exit(-1);
 		}
+	}
+	
+	private static void addOpts(Collection<String> opts, String[] args, int startArg) {
+		for (int i=startArg; i<args.length; i++) {
+			// add remaining optional arguments
+			opts.add(args[i]);
+		}
+	}
+	
+	private static void setThread(DotifyRegressionTesterRunner rt, String[] args, int thArg) {
+		try {
+			rt.setThreads(Integer.parseInt(args[thArg]));
+		} catch (NumberFormatException e) {
+			System.out.println(args[thArg] + " is not an integer.");
+		}		
+	}
+	
+	private static void setHaltOnError(DotifyRegressionTesterRunner rt, String[] args, int errArg) {
+		//This is a bit unusual, but the default value should be true and if the input is misspelled, it should use the default
+		rt.setHaltOnError(!"false".equalsIgnoreCase(args[errArg]));		
 	}
 
 	@SuppressWarnings("unchecked")
